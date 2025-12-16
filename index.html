@@ -1,49 +1,69 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net; img-src 'self' data:;">
-    <title>Stlite App on GitHub Pages</title>
-    <link
-      rel="stylesheet"
-      href="stlite.css"
-    />
-    <script
-      type="module"
-      src="stlite.js"
-    ></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Stlite App with Code Execution</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js"></script>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module">
-      stlite.mount({
-        requirements: ["pandas", "matplotlib"], 
-        entrypoint: "app.py",
-        files: {
-          "app.py": `
+    <streamlit-app>
+      <app-file name="streamlit_app.py" entrypoint>
 import streamlit as st
-import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
+from code_editor import code_editor
 
-st.title("Hello from Stlite! 🚀")
-st.write("This app is running entirely in your browser.")
+st.title("Press ▷ to execute the code below")
 
-name = st.text_input("What is your name?", "Explorer")
-st.write(f"Welcome, {name}!")
+# 1. Define the custom button
+custom_buttons = [{
+    "name": "Run",
+    "feather": "Play",
+    "primary": True,
+    "hasSecondary": False,
+    "showName": True,
+    "alwaysOn": True,
+    "commands": ["submit"] # This sends the code to response_dict
+}]
 
-chart_data = pd.DataFrame(
-    np.random.randn(20, 3),
-    columns=['a', 'b', 'c'])
+initial_code = """import matplotlib.pyplot as plt
+import numpy as np
+import streamlit as st
 
-st.line_chart(chart_data)
-`
-        }
-      }, document.getElementById("root"));
-    </script>
+st.write('Try editing this code and re-running it!')
+
+x = np.linspace(0, 10, 100)
+y = np.sin(x)
+
+plt.plot(x, y)
+st.pyplot(plt.gcf()) # Use gcf() to get the current figure
+"""
+
+
+# 2. Display the editor
+response_dict = code_editor(
+    initial_code, 
+    lang="python", 
+    buttons=custom_buttons
+)
+
+# 3. Handle the execution
+# The 'type' check ensures we only run when the button is pressed
+if response_dict['type'] == "submit" and len(response_dict['text']) > 0:
+    st.info("Execution Output:")
+    try:
+        exec(response_dict['text'])
+    except Exception as e:
+        st.error(f"Error: {e}")
+
+      </app-file>
+      <app-requirements>
+        matplotlib
+        streamlit-code-editor
+      </app-requirements>
+    </streamlit-app>
   </body>
 </html>
