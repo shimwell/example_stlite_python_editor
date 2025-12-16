@@ -7,19 +7,22 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net; img-src 'self' data:;">
     <title>Stlite App on GitHub Pages</title>
-    <script src="https://cdn.jsdelivr.net/gh/gzuidhof/coi-serviceworker@latest/coi-serviceworker.min.js"></script>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.39.0/build/stlite.css"
     />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.39.0/build/stlite.js"
+    ></script>
   </head>
   <body>
     <div id="root"></div>
-    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.39.0/build/stlite.js"></script>
-    <script>
+    <script type="module">
       stlite.mount({
-        requirements: ["pandas", "matplotlib"], // Add your pip packages here
+        requirements: ["pandas", "matplotlib"], 
         entrypoint: "app.py",
         files: {
           "app.py": `
@@ -38,8 +41,8 @@ chart_data = pd.DataFrame(
     columns=['a', 'b', 'c'])
 
 st.line_chart(chart_data)
-`,
-        },
+`
+        }
       }, document.getElementById("root"));
     </script>
   </body>
